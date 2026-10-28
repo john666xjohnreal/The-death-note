@@ -284,3 +284,228 @@ III. También un Shinigami puede permanecer en el mundo humano durante un máxim
 133• Cualquier humano involucrado en la compra o venta de la Death Note morirá.
 
 </p>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Death Note</title>
+
+<style>
+  body {
+    background: #111;
+    color: white;
+    font-family: Georgia, serif;
+    text-align: center;
+    padding: 20px;
+  }
+
+  #death-note {
+    position: relative;
+    width: 100%;
+    max-width: 580px;
+    margin: 20px auto;
+    line-height: 0;
+  }
+
+  #death-note img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Zona de escritura: encima de las dos páginas */
+  #writing-area {
+    position: absolute;
+    top: 14%;
+    left: 13%;
+    width: 74%;
+    height: 72%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2%;
+    box-sizing: border-box;
+  }
+
+  .page {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 4% 5%;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    text-align: left;
+    color: #17120e;
+    font-family: "Comic Sans MS", cursive;
+    font-size: clamp(10px, 2.1vw, 16px);
+    line-height: 1.65;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    caret-color: #8b0000;
+  }
+
+  .page:disabled {
+    opacity: 1;
+    color: #17120e;
+    cursor: default;
+  }
+
+  #controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px auto;
+  }
+
+  button {
+    background: #8b0000;
+    color: white;
+    border: 1px solid #555;
+    padding: 12px 18px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  button:hover {
+    background: #b30000;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  #status {
+    color: #bbb;
+    font-size: 14px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>DEATH NOTE</h1>
+<p>El cuaderno de los nombres...</p>
+
+<div id="controls">
+  <button id="start">Comenzar a escribir</button>
+  <button id="prev" disabled>Página anterior</button>
+  <button id="next" disabled>Siguiente página</button>
+</div>
+
+<div id="death-note">
+  <img
+    src="https://raw.githubusercontent.com/john666xjohnreal/The-death-note/refs/heads/main/3304b82f617a8301a9faabccd295f254.jpg"
+    alt="Death Note abierto"
+  >
+
+  <div id="writing-area">
+    <textarea
+      id="left-page"
+      class="page"
+      aria-label="Escribir en la página izquierda"
+      placeholder=""
+      disabled
+      spellcheck="false"
+    ></textarea>
+
+    <textarea
+      id="right-page"
+      class="page"
+      aria-label="Escribir en la página derecha"
+      placeholder=""
+      disabled
+      spellcheck="false"
+    ></textarea>
+  </div>
+</div>
+
+<p id="status">Pulsa «Comenzar a escribir» para abrir el cuaderno.</p>
+
+<script>
+(() => {
+  const start = document.getElementById("start");
+  const prev = document.getElementById("prev");
+  const next = document.getElementById("next");
+  const left = document.getElementById("left-page");
+  const right = document.getElementById("right-page");
+  const status = document.getElementById("status");
+
+  let pages = [["", ""]];
+  let currentPage = 0;
+  let started = false;
+  let activeSide = "left";
+
+  function saveCurrentPage() {
+    pages[currentPage] = [left.value, right.value];
+  }
+
+  function renderPage() {
+    left.value = pages[currentPage][0];
+    right.value = pages[currentPage][1];
+
+    prev.disabled = currentPage === 0;
+    next.disabled = !started;
+
+    status.textContent =
+      `Página ${currentPage + 1} · ${started ? "Puedes escribir" : "Cuaderno cerrado"}`;
+  }
+
+  function beginWriting() {
+    started = true;
+    left.disabled = false;
+    right.disabled = false;
+    start.textContent = "Escribiendo...";
+    renderPage();
+
+    (activeSide === "left" ? left : right).focus();
+  }
+
+  start.addEventListener("click", beginWriting);
+
+  left.addEventListener("focus", () => {
+    activeSide = "left";
+  });
+
+  right.addEventListener("focus", () => {
+    activeSide = "right";
+  });
+
+  prev.addEventListener("click", () => {
+    if (currentPage === 0) return;
+
+    saveCurrentPage();
+    currentPage--;
+    renderPage();
+  });
+
+  next.addEventListener("click", () => {
+    if (!started) return;
+
+    saveCurrentPage();
+    currentPage++;
+
+    if (!pages[currentPage]) {
+      pages.push(["", ""]);
+    }
+
+    renderPage();
+    left.focus();
+  });
+
+  // Conserva el texto de la página actual al escribir.
+  left.addEventListener("input", saveCurrentPage);
+  right.addEventListener("input", saveCurrentPage);
+})();
+</script>
+
+</body>
+</html>
+
